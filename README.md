@@ -5,7 +5,7 @@
 ![screenshot](./app_screenshot.png)
 
 Objectives:
-- Knowledge about Kubernete's platform
+- Knowledge about Kubernetes platform
 - Good practices 
 - Practical workflow
 
@@ -46,6 +46,13 @@ Networking:
     - Container networking interface: specification and libraries for writing plugins to configure network interfaces in Linux containers. Kubernetes uses CNI as an interface between network providers and Kubernetes pod networking.
 
 [Container networking interface](https://rancher.com/docs/rancher/v2.x/en/faq/networking/cni-providers/#:~:text=CNI%20(Container%20Network%20Interface)%2C,with%20a%20number%20of%20plugins.&text=Kubernetes%20uses%20CNI%20as%20an,providers%20and%20Kubernetes%20pod%20networking.)
+
+Kubernetes service types:
+
+    - ClusterIP: a virtual IP is assigned to service
+    - NodePort: a port is assigned to service
+    - LoadBalancer: external balancer provided to service
+    - ExternalName: DNS entrance managed by CoreDNS
 
 ### Prerequisites
 
@@ -123,7 +130,17 @@ One or more machines running one of:
 
     `kubectl run PODNAME --image alpine ping 1.1.1.1` (Deprecated) Create deployment of alpine Docker image running a ping command
 
-    `kubectl get all` 
+    `kubectl get all`
+
+- Scale deployment
+
+    `kubectl scale deploy/pingpong --replicas 8`
+
+- Print POD specifications
+
+    `kubectl run  --dry-run -o yaml PODNAME --image alpine ping 1.1.1.1`
+
+
 
 ### Run tests
 
