@@ -89,6 +89,42 @@ One or more machines running one of:
 
 ### Usage
 
+- Using Minikube cluster
+
+    `minikube start -p NAME`
+
+    `minikube config`
+
+    `minikube status`
+
+    `minikube dashboard`
+
+    `kubectl create deployment hello-node --image=k8s.gcr.io/echoserver:1.4` Execute container based on docker provided image
+
+    `kubectl get deployments`
+
+    `kubectl get pods -o wide`
+
+    `kubectl describe node NAME`
+
+- Exploring kubectl in kubeadm cluster
+
+    `home/user/.kube/config: definition used by kubectl to connect to the cluster (context)`
+
+    `kubectl describe node NAME`
+
+    `kubectl get nodes -o yaml` Yaml node definition
+
+    `kubectl explain node` Node specification
+
+    `kubectl get secrets -n kube-public`
+
+- Creating and using PODs
+
+    `kubectl run PODNAME --image alpine ping 1.1.1.1` (Deprecated) Create deployment of alpine Docker image running a ping command
+
+    `kubectl get all` 
+
 ### Run tests
 
 ### Deployment
