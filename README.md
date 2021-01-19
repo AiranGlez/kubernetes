@@ -56,6 +56,8 @@ Kubernetes service types:
 
 Kubernetes endpoint: object that gets IP addresses of individual pods assigned to it. Then is referenced by a K8S service, so that the service has a record of the internal IPs of PODs, in order to be able to communicate with them.
 
+Kubectl-proxy: 
+
 ### Prerequisites
 
 #### Hardware Requirements
@@ -176,14 +178,94 @@ One or more machines running one of:
 
     `kubectl get endpoints httpenv -o yaml`
 
-### Application deployment in Kubernetes
+### Application deployment in Kubernetes (dockercoins)
+
+- Deploy services from images
+
+    `kubectl create deployment redis --image redis`
+
+    `kubectl create deployment hasher --image dockercoins/hasher:v0.1`
+
+    `kubectl create deployment rng --image dockercoins/rng:v0.1`
+
+    `kubectl create deployment webui --image dockercoins/webui:v0.1`
+
+    `kubectl create deployment worker --image dockercoins/worker:v0.1`
+
+    `kubectl logs deploy/DEPLOYNAME`
+
+- Expose services
+
+    `kubectl expose deployment redis --port 6379`
+
+    `kubectl expose deployment rng --port 80`
+
+    `kubectl expose deployment hasher --port 80`
+
+    `kubectl get svc`
+
+- Allow public access through port
+
+    `kubectl expose deploy/webui --type=NodePort --port=80`
+
+    `kubectl get svc`
+
+    `curl http://PUBLICIP:PUBLICPORT/index.html`
+
+- Configure kubectl-proxy
+
+    `kubectl get svc kubernetes`
+
+    `curl -k http://K8SSERVICEIP`
+
+    `less .kube/config` Check certificate
+
+    `kubectl proxy &` Use '&' to send process to background
+
+    `curl -k http://localhost:8001` Access K8S API
+
+    `kubectl port-forward svc/redis 10000:6379 &`
+
+    `telnet localhost 10000`
+
+- Kubernetes dashboard
+
+    `cd /curso-kubernetes/k8s`
+
+    `kubectl apply -f kubernetes-dashboard.yaml` Create K8S dashboard deployment, services
+
+    `kubectl get svc -n kube-system` Check K8S dashboard service
+
+    `curl https://DASHBOARDSERVICEIP:443 -k`
+
+    `kubectl edit service kubernetes-dashboard -n kube-system` Open yaml definition of service for editting
+
+    Edit file --> service 'type: ClusterIP' to 'type: NodePort'
+
+    `kubectl get svc -n kube-system` Get reserved port
+
+    In browser: https://PUBLICIP:DASHBOARDPORT
+
+    `kubectl apply -f grant-admin-to-dashboard.yaml` Grant admin access on dashboard
+
+- LoadBalancer & Daemon Sets
+
+    `kubectl get deploy/rng -o yaml --export > rng.yaml`
+
+    Edit rng.yaml --> 'kind: Deployment' to 'kind: DaemonSet'
+
+    `kubectl apply -f rng.yaml --validate=false`
+
+    `kubectl describe svc rng` Endpoints, labels
+
+    `kubectl get pods --selector=app=rng`
 
 ## Authors
 
 👤 **Author1**
 
 - GitHub: [@githubhandle](https://github.com/AiranGlez)
-- LinkedIn: [LinkedIn](https://linkedin.com/linkedinhandle)
+- LinkedIn: [LinkedIn](www.linkedin.com/in/airanglez)
 
 ## 🤝 Contributing
 
