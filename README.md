@@ -56,7 +56,16 @@ Kubernetes service types:
 
 Kubernetes endpoint: object that gets IP addresses of individual pods assigned to it. Then is referenced by a K8S service, so that the service has a record of the internal IPs of PODs, in order to be able to communicate with them.
 
-Kubectl-proxy: 
+Kubectl-proxy:
+
+Healthchecks:
+
+    - Liveness:
+    - Readiness:
+    - ExecAction: execute a command inside the container
+    - TCPSocketAction: performs a TCP check against container's IP adress on a specified port
+    - HTTPGetAction: performs an HTTP GET request to container's IP
+
 
 ### Prerequisites
 
@@ -260,9 +269,70 @@ One or more machines running one of:
 
     `kubectl get pods --selector=app=rng`
 
+- Controlled deployments: rolling upgrades
+
+    `kubectl get deploy -o json | jq ".items[] | {name:.metadata.name} + .spec.strategy.rollingUpdate`
+
+    `kubectl set image deploy worker worker=dockercoins/worker:v0.2`
+
+    `kubectl rollout undo deploy worker` In case of error updating the deployment
+
+    `kubectl edit deploy worker` Edit deploy configuration
+
+- Healthchecks
+
+    `kubectl edit deploy/redis`
+
+    `Edit:`
+
+        spec:
+            containers:
+                image: redis
+                imagePullPolicy: Always
+                name: redis
+            --> livenessProbe:
+                    exec:
+                        command: ["redis-cli", "ping"]
+
+### Bonus
+
+- Managing stacks with Helm
+
+    [Install Helm](https://helm.sh/docs/intro/install/)
+
+    `helm init`
+
+    `kubectl get pods -n kube-system` Check for 'tiller' POD
+
+    `kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default` Give admin permision to Helm server side (tiller)
+
+    `helm search`
+
+    `helm search prometheus`
+
+    `helm inspect stable/prometheus`
+
+    `helm install stable/prometheus --set server.service.type=NodePort --set server.persistentVolume.enabled=false`
+
+    Create Helm chart:
+
+    `helm create dockercoin`
+
+    `cd dockercoin`
+
+    `mv templates/ templates-old`
+
+    `mkdir templates`
+
+    `kubectl get -o yaml --export deployment worker` Do this with all resources deployed for the application to /templates
+
+    `helm install dockercoins`
+
+
+
 ## Authors
 
-👤 **Author1**
+👤 **AiranGlez**
 
 - GitHub: [@githubhandle](https://github.com/AiranGlez)
 - LinkedIn: [LinkedIn](www.linkedin.com/in/airanglez)
