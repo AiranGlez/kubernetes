@@ -15,9 +15,9 @@ Objectives:
 - Frameworks
 - Technologies used
 
-## Live Demo
+## Test Application
 
-[Live Demo Link](https://livedemo.com)
+[Dockercoins](/dockercoins/)
 
 
 ## Getting Started: Concepts
@@ -53,6 +53,8 @@ Kubernetes service types:
     - NodePort: a port is assigned to service
     - LoadBalancer: external balancer provided to service
     - ExternalName: DNS entrance managed by CoreDNS
+
+Kubernetes endpoint: object that gets IP addresses of individual pods assigned to it. Then is referenced by a K8S service, so that the service has a record of the internal IPs of PODs, in order to be able to communicate with them.
 
 ### Prerequisites
 
@@ -93,6 +95,8 @@ One or more machines running one of:
 [Minikube](https://minikube.sigs.k8s.io/docs/start/)
 
 [Kubeadm, kubectl & kubelet](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+
+[KIND](https://www.youtube.com/watch?v=4p4DqdTDqkk&ab_channel=JustmeandOpensource)
 
 ### Usage
 
@@ -140,18 +144,45 @@ One or more machines running one of:
 
     `kubectl run  --dry-run -o yaml PODNAME --image alpine ping 1.1.1.1`
 
+- Access POD through service
 
+    `kubectl create deployment httpenv --image jpetazzo/httpenv`
 
-### Run tests
+    `kubectl scale deployment httpenv --replicas=10`
 
-### Deployment
+    `curl http://PODIP:8888` // `curl http://PODIP:8888 | jq ""` Check exposed POD
+
+    `kubectl expose deployment httpenv --port=8888` Create service for deployment (Default: ClusterIP)
+
+    `kubectl get services`
+
+    `curl http://SERVICEIP:8888` (Execute several times to check changes on the host)
+
+    `for i in $(seq 10); do curl -s http://SERVICEIP:8888 | jq .HOSTNAME; done`
+
+- Routing traffic using services
+
+    `sudo iptables -t nat -L OUTPUT` 
+
+    `sudo iptables -t nat -nL KUBE_SERVICES` Check routing rules for K8S
+
+    `sudo iptables -t nat -nL SERVICENAME(KUBE_SVC)` List K8S service routing rules (node distribution)
+
+    `sudo iptables -t nat -nL KUBEROUTINGNAME(KUBE-SEP)` Node routing rule
+
+    `kubectl describe service httpenv`
+
+    `kubectl describe endpoints httpenv`
+
+    `kubectl get endpoints httpenv -o yaml`
+
+### Application deployment in Kubernetes
 
 ## Authors
 
 👤 **Author1**
 
-- GitHub: [@githubhandle](https://github.com/githubhandle)
-- Twitter: [@twitterhandle](https://twitter.com/twitterhandle)
+- GitHub: [@githubhandle](https://github.com/AiranGlez)
 - LinkedIn: [LinkedIn](https://linkedin.com/linkedinhandle)
 
 ## 🤝 Contributing
