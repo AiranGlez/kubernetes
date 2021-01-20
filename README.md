@@ -66,6 +66,12 @@ Healthchecks:
     - TCPSocketAction: performs a TCP check against container's IP adress on a specified port
     - HTTPGetAction: performs an HTTP GET request to container's IP
 
+Namespaces:
+
+    - No resource isolation
+    - POD in namespace A can communicate with other in namespace B
+    - Any POD in the cluster can communicate with K8S API
+
 
 ### Prerequisites
 
@@ -328,7 +334,89 @@ One or more machines running one of:
 
     `helm install dockercoins`
 
+- Managing configurations with config maps
 
+    `/curso-kubernetes/k8s/haproxy.cfg`
+
+    `kubectl create configmap haproxy --from-file=haproxy.cfg`
+
+    `kubectl get configmap haproxy -o yaml`
+
+    `kubectl apply -f haproxy.yaml`
+
+    `kubectl create configmap registry --from-literal=http.addr=0.0.0.0:80`
+
+    `kubect apply -f registry.yaml`
+
+- Volumes
+
+- Namespaces
+
+    `kubectl get namespaces`
+
+    `kubectl create namespace NAME`
+
+    `kubectl config get-contexts`
+
+    `kubectl config set-context --current --namespace=NAME`
+
+- Deploy multiple instances of the same app
+
+    `K8S API: https://kubernetes.default.svc.cluster.local:443` From inside the POD
+
+    `kubectl run --image alpine -ti bash`
+
+    `curl https://kubernetes.default.svc.cluster.local:443`
+
+    `kubectl config set-context --current --namespace=NAME`
+
+    `helm install CHARNAME`
+
+- Authentication & Authorization
+
+    `curl -k https://KUBERNETESSERVICEIP` Forbidden (anonymous user)
+
+    `kubectl config view --raw -o json | jq -r .users[0].user[\"client-certificate-data\"] | base64 -d | openssl x509 -text | grep Subject`
+
+    Service Account Token:
+
+    `kubectl get serviceaccounts`
+
+    `kubectl get sa default -o yaml`
+
+    `kubectl get sa default -o json | jq -r .secrets[0].name`
+
+    `kubectl get secret SECRETNAME -o yaml`
+
+    `kubectl get secret SECRETNAME -o json | jq -r .data.token | base64 -d` Copy resultant token
+
+    `curl -k https://KUBERNETESSERVICEIP -H "Authorization: Bearer (COPYTOKENHERE)"`
+
+    RBAC (Role Based Access Control)
+
+    `kubectl create sa viewer`
+
+    `kubectl create rolebinding viewercanview --clusterrole=view --serviceaccount=default:viewer`
+
+    `kubectl run eyepod --rm -ti --restart=Never --serviceaccount=viewer --image alpine` Create POD with rolebinding
+
+    `kubectl auth can-i (list nodes), (create pods), (get pods)` Inside POD
+
+    `kubectl get clusterrolebindings -o yaml | grep -e kubernetes-admin -e system:masters`
+
+    `kubectl describe clusterrolebindings cluster-admin`
+
+### Better practices & tips
+
+    - Write Dockerfiles for apps
+    - Write compose files to describe services
+    - Learn advantages of container deployment 
+    - Configure automatic image building
+    - Automatize staging pipeline
+    - Next steps:
+      - Stateful services
+      - Storage provider, Persisten Volumes & Stateful set
+      - HTTP traffic: ingress controller (virtual host routing)
 
 ## Authors
 
@@ -346,12 +434,6 @@ Feel free to check the [issues page](issues/).
 ## Show your support
 
 Give a ⭐️ if you like this project!
-
-## Acknowledgments
-
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
 
 ## 📝 License
 
